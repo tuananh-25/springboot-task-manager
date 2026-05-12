@@ -1,0 +1,23 @@
+spring:
+  datasource:
+    url: jdbc:sqlserver://localhost:1433;databaseName=task_manager;encrypt=true;trustServerCertificate=true
+    username: sa
+    password: 123
+    driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+
+    show-sql: true
+
+    properties:
+      hibernate:
+        format_sql: true
+
+server:
+  port: 8080
+
+jwt:
+  secret-key: 12345678901234567890123456789012
+  expiration: 86400000
