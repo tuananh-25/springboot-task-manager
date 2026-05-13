@@ -1,15 +1,13 @@
 package com.example.taskmanager.entity;
 import com.example.taskmanager.entity.base.BaseEntity;
 import com.example.taskmanager.entity.enums.Role;
-import jakarta.persistence.Entity;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import jakarta.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
+import jakarta.persistence.OneToMany;
 @Getter
 @Setter
 @Builder
@@ -35,4 +33,7 @@ public class User extends BaseEntity {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Role role;
+
+    @OneToMany(mappedBy = "user")
+    private List<Task> tasks = new ArrayList<>();
 }
