@@ -15,6 +15,11 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import java.util.List;
 import com.example.taskmanager.dto.task.UpdateTaskStatusRequest;
+import com.example.taskmanager.dto.common.PaginationResponse;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 @Service
 @RequiredArgsConstructor
 public class TaskServiceImpl implements TaskService {
@@ -41,15 +46,54 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public List<TaskResponse> getMyTasks() {
+    public PaginationResponse<TaskResponse> getMyTasks(
+            int page,
+            int size,
+            String sortBy,
+            String sortDirection,
+            String keyword
+    ) {
 
         User currentUser = getCurrentUser();
 
-        List<Task> tasks = taskRepository.findByUser(currentUser);
+        Sort sort = sortDirection.equalsIgnoreCase("desc")
+                ? Sort.by(sortBy).descending()
+                : Sort.by(sortBy).ascending();
 
-        return tasks.stream()
-                .map(this::mapToTaskResponse)
-                .toList();
+        Pageable pageable = PageRequest.of(page, size, sort);
+
+        Page<Task> taskPage;
+
+        if (keyword != null && !keyword.isBlank()) {
+
+            taskPage = taskRepository
+                    .findByUserAndTitleContainingIgnoreCase(
+                            currentUser,
+                            keyword,
+                            pageable
+                    );
+
+        } else {
+
+            taskPage = taskRepository.findByUser(
+                    currentUser,
+                    pageable
+            );
+        }
+
+        return PaginationResponse.<TaskResponse>builder()
+                .items(
+                        taskPage.getContent()
+                                .stream()
+                                .map(this::mapToTaskResponse)
+                                .toList()
+                )
+                .page(taskPage.getNumber())
+                .size(taskPage.getSize())
+                .totalElements(taskPage.getTotalElements())
+                .totalPages(taskPage.getTotalPages())
+                .last(taskPage.isLast())
+                .build();
     }
 
     @Override

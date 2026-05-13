@@ -11,6 +11,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import com.example.taskmanager.dto.task.UpdateTaskStatusRequest;
 import java.util.List;
+import com.example.taskmanager.dto.common.PaginationResponse;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+@Tag(name = "Task API", description = "Task management endpoints")
 
 @RestController
 @RequestMapping("/api/tasks")
@@ -38,12 +42,31 @@ public class TaskController {
     }
 
     @GetMapping
-    public ResponseEntity<ApiResponse<List<TaskResponse>>> getMyTasks() {
+    public ResponseEntity<ApiResponse<PaginationResponse<TaskResponse>>> getMyTasks(
 
-        List<TaskResponse> tasks = taskService.getMyTasks();
+            @RequestParam(defaultValue = "0") int page,
 
-        ApiResponse<List<TaskResponse>> response =
-                ApiResponse.<List<TaskResponse>>builder()
+            @RequestParam(defaultValue = "5") int size,
+
+            @RequestParam(defaultValue = "createdAt") String sortBy,
+
+            @RequestParam(defaultValue = "desc") String sortDirection,
+
+            @RequestParam(required = false) String keyword
+    ) {
+
+        PaginationResponse<TaskResponse> tasks =
+                taskService.getMyTasks(
+                        page,
+                        size,
+                        sortBy,
+                        sortDirection,
+                        keyword
+                );
+
+        ApiResponse<PaginationResponse<TaskResponse>> response =
+                ApiResponse
+                        .<PaginationResponse<TaskResponse>>builder()
                         .success(true)
                         .message("Get tasks successful")
                         .data(tasks)
