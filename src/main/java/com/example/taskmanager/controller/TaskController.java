@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import com.example.taskmanager.dto.task.UpdateTaskStatusRequest;
+import com.example.taskmanager.constant.AppConstants;
 import java.util.List;
 import com.example.taskmanager.dto.common.PaginationResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -41,16 +42,17 @@ public class TaskController {
                 .body(response);
     }
 
+
     @GetMapping
     public ResponseEntity<ApiResponse<PaginationResponse<TaskResponse>>> getMyTasks(
 
-            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = AppConstants.DEFAULT_PAGE_NUMBER) int page,
 
-            @RequestParam(defaultValue = "5") int size,
+            @RequestParam(defaultValue = AppConstants.DEFAULT_PAGE_SIZE) int size,
 
-            @RequestParam(defaultValue = "createdAt") String sortBy,
+            @RequestParam(defaultValue = AppConstants.DEFAULT_SORT_BY) String sortBy,
 
-            @RequestParam(defaultValue = "desc") String sortDirection,
+            @RequestParam(defaultValue = AppConstants.DEFAULT_SORT_DIRECTION) String sortDirection,
 
             @RequestParam(required = false) String keyword
     ) {

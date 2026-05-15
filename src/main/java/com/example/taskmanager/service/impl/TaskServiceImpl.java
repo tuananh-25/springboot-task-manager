@@ -101,10 +101,7 @@ public class TaskServiceImpl implements TaskService {
 
         User currentUser = getCurrentUser();
 
-        Task task = taskRepository.findByIdAndUser(id, currentUser)
-                .orElseThrow(() ->
-                        new ResourceNotFoundException("Task not found")
-                );
+        Task task = getTaskByIdAndUser(id, currentUser);
 
         return mapToTaskResponse(task);
     }
@@ -128,6 +125,7 @@ public class TaskServiceImpl implements TaskService {
                 .description(task.getDescription())
                 .status(task.getStatus().name())
                 .createdAt(task.getCreatedAt())
+                .updatedAt(task.getUpdatedAt())
                 .build();
     }
 
@@ -136,10 +134,7 @@ public class TaskServiceImpl implements TaskService {
 
         User currentUser = getCurrentUser();
 
-        Task task = taskRepository.findByIdAndUser(id, currentUser)
-                .orElseThrow(() ->
-                        new ResourceNotFoundException("Task not found")
-                );
+        Task task = getTaskByIdAndUser(id, currentUser);
 
         task.setTitle(request.getTitle());
 
@@ -151,17 +146,11 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public TaskResponse updateTaskStatus(
-            Long id,
-            UpdateTaskStatusRequest request
-    ) {
+    public TaskResponse updateTaskStatus(Long id, UpdateTaskStatusRequest request) {
 
         User currentUser = getCurrentUser();
 
-        Task task = taskRepository.findByIdAndUser(id, currentUser)
-                .orElseThrow(() ->
-                        new ResourceNotFoundException("Task not found")
-                );
+        Task task = getTaskByIdAndUser(id, currentUser);
 
         task.setStatus(request.getStatus());
 
@@ -175,11 +164,16 @@ public class TaskServiceImpl implements TaskService {
 
         User currentUser = getCurrentUser();
 
-        Task task = taskRepository.findByIdAndUser(id, currentUser)
+        Task task = getTaskByIdAndUser(id, currentUser);
+
+        taskRepository.delete(task);
+    }
+
+    private Task getTaskByIdAndUser(Long id, User user) {
+
+        return taskRepository.findByIdAndUser(id, user)
                 .orElseThrow(() ->
                         new ResourceNotFoundException("Task not found")
                 );
-
-        taskRepository.delete(task);
     }
 }
